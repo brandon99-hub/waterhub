@@ -1,0 +1,41 @@
+Project Name: WaterHub Lite Management System Tech Stack: Use a modern stack (e.g., React/Next.js for frontend, Node.js/Express for backend, and a database like PostgreSQL or MongoDB).
+
+1. Core Concept
+Build a streamlined Client & IoT Meter Management system. The UI must be single-page focused, meaning almost all data entry (Create/Edit) happens via Modals rather than navigating to new pages.
+
+2. Database Schema & Modals
+Create the following tables and their corresponding "Add" modals with these exact fields:
+
+Admins: Name, Email, Address, Phone.
+
+Clients: Name, Email, Address, Phone.
+
+Sites: Site Name, Client (Dropdown link to Clients).
+
+Operation Modes: Mode Name, Mode Description.
+
+Establishment Types: Type/Name.
+
+Establishments: Establishment Name, Establishment Type (Dropdown), Site (Dropdown).
+
+Meters: Serial No, Imei No, Client (Dropdown), Operation Mode (Dropdown), Simcard, Type, Meter Size, Technology.
+
+Billing Profile (Configuration Modal): * Client (Dropdown), Tariff, Quota (L), Automated Billing (Yes/No Toggle).
+
+Rate in KES, Rate in Litres.
+
+Mpesa Keys (Settings Modal): * Select User (Dropdown), Select Account Type, Consumer Key, Business Account, Consumer Secret, Short Code, Pass Key, Initiator, Security Credential.
+
+3. UI & Navigation Requirements
+Sidebar: Home, User Management (Admins, Clients), Site Management, Meter Management, Operation Modes, Establishment Management (Types, Establishments), Settings.
+
+The Home Page: Dashboard with 4 summary cards showing total counts of Clients, Sites, Meters, and Active Admins. Include a "Quick Actions" section with buttons to launch the "Add Client" and "Add Meter" modals immediately.
+
+List Views: Every navigation item should open a page with a searchable Table of existing records.
+
+Modal Workflow: The "Add New" button on every page must trigger a Modal Overlay. Upon saving, the modal closes and the table refreshes automatically without a full page reload.
+
+4. System Logic
+Relational Dropdowns: When adding a Site, the "Client" field must be a dropdown fetching data from the Clients table. When adding a Meter, "Client" and "Operation Mode" must be dropdowns.
+
+Simplified Operations: In the Meter Management list, include a column for "Operation Mode" that allows the user to update the mode quickly.
