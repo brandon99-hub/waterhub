@@ -19,7 +19,7 @@ export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
-  address: text("address").notNull(),
+  businessAddress: text("business_address"), // Landlord's business/contact address
   phone: text("phone").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -27,7 +27,10 @@ export const clients = pgTable("clients", {
 export const sites = pgTable("sites", {
   id: serial("id").primaryKey(),
   siteName: text("site_name").notNull(),
+  location: text("location"), // Formatted place name (e.g., "Kileleshwa, Nairobi")
   clientId: integer("client_id").references(() => clients.id).notNull(),
+  latitude: numeric("latitude"),
+  longitude: numeric("longitude"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -52,16 +55,32 @@ export const establishments = pgTable("establishments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const occupancies = pgTable("occupancies", {
+  id: serial("id").primaryKey(),
+  establishmentId: integer("establishment_id").references(() => establishments.id).notNull(),
+  unitNumber: text("unit_number").notNull(), // e.g., "D4", "C2", "B3"
+  customerName: text("customer_name"), // Tenant name
+  customerPhone: text("customer_phone"),
+  customerEmail: text("customer_email"),
+  meterId: integer("meter_id").references(() => meters.id), // Nullable - can be unassigned
+  status: text("status").default("vacant"), // "occupied" | "vacant"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const meters = pgTable("meters", {
   id: serial("id").primaryKey(),
   serialNo: text("serial_no").notNull(),
   imeiNo: text("imei_no").notNull(),
   clientId: integer("client_id").references(() => clients.id).notNull(),
+  establishmentId: integer("establishment_id").references(() => establishments.id),
   operationModeId: integer("operation_mode_id").references(() => operationModes.id).notNull(),
   simcard: text("simcard").notNull(),
   type: text("type").notNull(),
   meterSize: text("meter_size").notNull(),
   technology: text("technology").notNull(),
+  valveStatus: text("valve_status").default("open"), // "open", "closed", "offline"
+  latestReading: integer("latest_reading").default(0), // Latest totalizer reading in liters
+  lastReadingTime: timestamp("last_reading_time"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -71,8 +90,12 @@ export const billingProfiles = pgTable("billing_profiles", {
   tariff: text("tariff").notNull(),
   quota: integer("quota").notNull(), // Litres
   automatedBilling: boolean("automated_billing").default(false).notNull(),
+  baseRate: numeric("base_rate").default("0").notNull(),
+  sewerCharge: numeric("sewer_charge").default("0").notNull(),
+  serviceFee: numeric("service_fee").default("0").notNull(),
   rateKes: numeric("rate_kes").notNull(),
   rateLitres: numeric("rate_litres").notNull(),
+  status: text("status").default("active").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -88,6 +111,25 @@ export const mpesaKeys = pgTable("mpesa_keys", {
   initiator: text("initiator").notNull(),
   securityCredential: text("security_credential").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const transactions = pgTable("transactions", {
+  id: serial("id").primaryKey(),
+  meterId: integer("meter_id").references(() => meters.id).notNull(),
+  amount: numeric("amount").notNull(),
+  volume: integer("volume").notNull(), // Litres
+  status: text("status").notNull(), // 'success', 'pending', 'failed'
+  type: text("type").notNull(), // 'payment', 'recharge', 'refund'
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
+  meterId: integer("meter_id").references(() => meters.id),
+  siteId: integer("site_id").references(() => sites.id),
+  eventType: text("event_type").notNull(), // 'alert', 'info', 'status_change'
+  description: text("description").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
 });
 
 // === RELATIONS ===
@@ -122,6 +164,10 @@ export const metersRelations = relations(meters, ({ one }) => ({
     fields: [meters.clientId],
     references: [clients.id],
   }),
+  establishment: one(establishments, {
+    fields: [meters.establishmentId],
+    references: [establishments.id],
+  }),
   operationMode: one(operationModes, {
     fields: [meters.operationModeId],
     references: [operationModes.id],
@@ -132,6 +178,24 @@ export const mpesaKeysRelations = relations(mpesaKeys, ({ one }) => ({
   admin: one(admins, {
     fields: [mpesaKeys.adminId],
     references: [admins.id],
+  }),
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  meter: one(meters, {
+    fields: [transactions.meterId],
+    references: [meters.id],
+  }),
+}));
+
+export const eventsRelations = relations(events, ({ one }) => ({
+  meter: one(meters, {
+    fields: [events.meterId],
+    references: [meters.id],
+  }),
+  site: one(sites, {
+    fields: [events.siteId],
+    references: [sites.id],
   }),
 }));
 
@@ -170,6 +234,15 @@ export type InsertMeter = z.infer<typeof insertMeterSchema>;
 
 export type BillingProfile = typeof billingProfiles.$inferSelect;
 export type InsertBillingProfile = z.infer<typeof insertBillingProfileSchema>;
+
+export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, timestamp: true });
+export const insertEventSchema = createInsertSchema(events).omit({ id: true, timestamp: true });
+
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+
+export type AppEvent = typeof events.$inferSelect;
+export type InsertEvent = z.infer<typeof insertEventSchema>;
 
 export type MpesaKey = typeof mpesaKeys.$inferSelect;
 export type InsertMpesaKey = z.infer<typeof insertMpesaKeySchema>;

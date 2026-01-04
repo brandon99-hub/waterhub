@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertAdmin } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type InsertAdmin } from "@shared/schema";
 
 export function useAdmins() {
   return useQuery({
@@ -52,9 +53,9 @@ export function useDeleteAdmin() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.admins.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.admins.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete admin");
     },

@@ -9,6 +9,12 @@ import Admins from "@/pages/Admins";
 import Clients from "@/pages/Clients";
 import Sites from "@/pages/Sites";
 import Meters from "@/pages/Meters";
+import OperationModes from "@/pages/OperationModes";
+import EstablishmentTypes from "@/pages/EstablishmentTypes";
+import Establishments from "@/pages/Establishments";
+import Occupancies from "@/pages/Occupancies";
+import BillingProfiles from "@/pages/BillingProfiles";
+import MpesaKeys from "@/pages/MpesaKeys";
 
 // Placeholder components for unimplemented pages to avoid crashes
 const Placeholder = ({ title }: { title: string }) => (
@@ -32,13 +38,12 @@ function Router() {
       <Route path="/clients" component={Clients} />
       <Route path="/sites" component={Sites} />
       <Route path="/meters" component={Meters} />
-      
-      {/* Placeholders for remaining routes */}
-      <Route path="/operation-modes"><Placeholder title="Operation Modes" /></Route>
-      <Route path="/establishment-types"><Placeholder title="Establishment Types" /></Route>
-      <Route path="/establishments"><Placeholder title="Establishments" /></Route>
-      <Route path="/billing-profiles"><Placeholder title="Billing Profiles" /></Route>
-      <Route path="/mpesa-keys"><Placeholder title="Mpesa Keys" /></Route>
+      <Route path="/operation-modes" component={OperationModes} />
+      <Route path="/establishment-types" component={EstablishmentTypes} />
+      <Route path="/establishments" component={Establishments} />
+      <Route path="/establishments/:id/occupancies" component={Occupancies} />
+      <Route path="/billing-profiles" component={BillingProfiles} />
+      <Route path="/mpesa-keys" component={MpesaKeys} />
 
       <Route component={NotFound} />
     </Switch>

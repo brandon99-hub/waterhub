@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { 
+import {
   insertAdminSchema, admins,
   insertClientSchema, clients,
   insertSiteSchema, sites,
@@ -9,7 +9,10 @@ import {
   insertEstablishmentSchema, establishments,
   insertMeterSchema, meters,
   insertBillingProfileSchema, billingProfiles,
-  insertMpesaKeySchema, mpesaKeys
+  insertMpesaKeySchema, mpesaKeys,
+  insertTransactionSchema, transactions,
+  insertEventSchema, events,
+  type Transaction, type AppEvent
 } from './schema';
 
 export const errorSchemas = {
@@ -359,6 +362,33 @@ export const api = {
       },
     },
   },
+  transactions: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/transactions',
+      responses: {
+        200: z.array(z.custom<Transaction>()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/transactions',
+      input: insertTransactionSchema,
+      responses: {
+        201: z.custom<Transaction>(),
+        400: errorSchemas.validation,
+      },
+    },
+  },
+  events: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/events',
+      responses: {
+        200: z.array(z.custom<AppEvent>()),
+      },
+    },
+  },
   dashboard: {
     stats: {
       method: 'GET' as const,
@@ -369,6 +399,8 @@ export const api = {
           sitesCount: z.number(),
           metersCount: z.number(),
           adminsCount: z.number(),
+          totalRevenue: z.number(),
+          monthlyConsumption: z.number(),
         }),
       },
     },

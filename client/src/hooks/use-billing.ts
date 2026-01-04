@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertBillingProfile, type InsertMpesaKey } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type InsertBillingProfile, type InsertMpesaKey } from "@shared/schema";
 
 // --- Billing Profiles ---
 export function useBillingProfiles() {
@@ -53,9 +54,9 @@ export function useDeleteBillingProfile() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.billingProfiles.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.billingProfiles.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete billing profile");
     },
@@ -115,9 +116,9 @@ export function useDeleteMpesaKey() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.mpesaKeys.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.mpesaKeys.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete Mpesa key");
     },

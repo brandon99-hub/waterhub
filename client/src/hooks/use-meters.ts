@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertMeter } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type InsertMeter } from "@shared/schema";
 
 export function useMeters() {
   return useQuery({
@@ -52,9 +53,9 @@ export function useDeleteMeter() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.meters.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.meters.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete meter");
     },

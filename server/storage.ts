@@ -1,11 +1,14 @@
 
 import { db } from "./db";
-import { 
-  admins, clients, sites, operationModes, establishmentTypes, establishments, meters, billingProfiles, mpesaKeys,
-  type InsertAdmin, type InsertClient, type InsertSite, type InsertOperationMode, type InsertEstablishmentType, 
+import {
+  admins, clients, sites, operationModes, establishmentTypes, establishments, occupancies, meters, billingProfiles, mpesaKeys,
+  transactions, events,
+  type InsertAdmin, type InsertClient, type InsertSite, type InsertOperationMode, type InsertEstablishmentType,
   type InsertEstablishment, type InsertMeter, type InsertBillingProfile, type InsertMpesaKey,
-  type Admin, type Client, type Site, type OperationMode, type EstablishmentType, 
-  type Establishment, type Meter, type BillingProfile, type MpesaKey
+  type InsertTransaction, type InsertEvent,
+  type Admin, type Client, type Site, type OperationMode, type EstablishmentType,
+  type Establishment, type Meter, type BillingProfile, type MpesaKey,
+  type Transaction, type AppEvent
 } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 
@@ -73,13 +76,29 @@ export interface IStorage {
   updateMpesaKey(id: number, data: Partial<InsertMpesaKey>): Promise<MpesaKey>;
   deleteMpesaKey(id: number): Promise<void>;
 
+  // Occupancies
+  getOccupanciesByEstablishment(establishmentId: number): Promise<any[]>;
+  createOccupancy(data: any): Promise<any>;
+  updateOccupancy(id: number, data: any): Promise<any>;
+  deleteOccupancy(id: number): Promise<void>;
+
   // Dashboard Stats
   getDashboardStats(): Promise<{
     clientsCount: number;
     sitesCount: number;
     metersCount: number;
     adminsCount: number;
+    totalRevenue: number;
+    monthlyConsumption: number;
   }>;
+
+  // Transactions
+  getTransactions(limit?: number): Promise<Transaction[]>;
+  createTransaction(data: InsertTransaction): Promise<Transaction>;
+
+  // Events
+  getEvents(limit?: number): Promise<AppEvent[]>;
+  createEvent(data: InsertEvent): Promise<AppEvent>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -204,8 +223,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Meters
-  async getMeters(): Promise<Meter[]> {
-    return await db.select().from(meters);
+  async getMeters(): Promise<any[]> {
+    // LEFT JOIN with occupancies to get customer name
+    const results = await db
+      .select({
+        id: meters.id,
+        serialNo: meters.serialNo,
+        imeiNo: meters.imeiNo,
+        clientId: meters.clientId,
+        establishmentId: meters.establishmentId,
+        operationModeId: meters.operationModeId,
+        simcard: meters.simcard,
+        type: meters.type,
+        meterSize: meters.meterSize,
+        technology: meters.technology,
+        valveStatus: meters.valveStatus,
+        latestReading: meters.latestReading,
+        lastReadingTime: meters.lastReadingTime,
+        createdAt: meters.createdAt,
+        customerName: occupancies.customerName,
+      })
+      .from(meters)
+      .leftJoin(occupancies, eq(occupancies.meterId, meters.id));
+
+    return results;
   }
   async getMeter(id: number): Promise<Meter | undefined> {
     const [result] = await db.select().from(meters).where(eq(meters.id, id));
@@ -263,24 +304,81 @@ export class DatabaseStorage implements IStorage {
     await db.delete(mpesaKeys).where(eq(mpesaKeys.id, id));
   }
 
+  // Occupancies
+  async getOccupanciesByEstablishment(establishmentId: number): Promise<any[]> {
+    return await db
+      .select({
+        id: occupancies.id,
+        establishmentId: occupancies.establishmentId,
+        unitNumber: occupancies.unitNumber,
+        customerName: occupancies.customerName,
+        customerPhone: occupancies.customerPhone,
+        customerEmail: occupancies.customerEmail,
+        meterId: occupancies.meterId,
+        status: occupancies.status,
+        createdAt: occupancies.createdAt,
+        meterSerial: meters.serialNo,
+        meterTechnology: meters.technology,
+      })
+      .from(occupancies)
+      .leftJoin(meters, eq(meters.id, occupancies.meterId))
+      .where(eq(occupancies.establishmentId, establishmentId));
+  }
+  async createOccupancy(data: any): Promise<any> {
+    const [item] = await db.insert(occupancies).values(data).returning();
+    return item;
+  }
+  async updateOccupancy(id: number, data: any): Promise<any> {
+    const [item] = await db.update(occupancies).set(data).where(eq(occupancies.id, id)).returning();
+    return item;
+  }
+  async deleteOccupancy(id: number): Promise<void> {
+    await db.delete(occupancies).where(eq(occupancies.id, id));
+  }
+
   // Dashboard Stats
   async getDashboardStats(): Promise<{
     clientsCount: number;
     sitesCount: number;
     metersCount: number;
     adminsCount: number;
+    totalRevenue: number;
+    monthlyConsumption: number;
   }> {
     const [clientsCount] = await db.select({ count: sql<number>`count(*)` }).from(clients);
     const [sitesCount] = await db.select({ count: sql<number>`count(*)` }).from(sites);
     const [metersCount] = await db.select({ count: sql<number>`count(*)` }).from(meters);
     const [adminsCount] = await db.select({ count: sql<number>`count(*)` }).from(admins);
 
+    const [revenueSum] = await db.select({ sum: sql<number>`sum(cast(${transactions.amount} as numeric))` }).from(transactions).where(eq(transactions.status, 'success'));
+    const [consumptionSum] = await db.select({ sum: sql<number>`sum(${transactions.volume})` }).from(transactions);
+
     return {
       clientsCount: Number(clientsCount.count),
       sitesCount: Number(sitesCount.count),
       metersCount: Number(metersCount.count),
       adminsCount: Number(adminsCount.count),
+      totalRevenue: Number(revenueSum?.sum || 0),
+      monthlyConsumption: Number(consumptionSum?.sum || 0),
     };
+  }
+
+  // Transactions
+  async getTransactions(limit: number = 50): Promise<Transaction[]> {
+    return await db.select().from(transactions).orderBy(sql`${transactions.timestamp} DESC`).limit(limit);
+  }
+  async createTransaction(data: InsertTransaction): Promise<Transaction> {
+    const [result] = await db.insert(transactions).values(data).returning();
+    return result;
+  }
+
+  // Events
+  async getEvents(limit: number = 50): Promise<AppEvent[]> {
+    return await db.select().from(events).orderBy(sql`${events.timestamp} DESC`).limit(limit);
+  }
+  async createEvent(data: InsertEvent): Promise<AppEvent> {
+    const [result] = await db.insert(events).values(data).returning();
+    return result;
   }
 }
 

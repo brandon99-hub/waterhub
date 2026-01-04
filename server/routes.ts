@@ -9,7 +9,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
   // Dashboard Stats
   app.get(api.dashboard.stats.path, async (req, res) => {
     const stats = await storage.getDashboardStats();
@@ -45,11 +45,11 @@ export async function registerRoutes(
       const item = await storage.updateAdmin(Number(req.params.id), input);
       res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.admins.delete.path, async (req, res) => {
@@ -69,28 +69,28 @@ export async function registerRoutes(
   });
   app.post(api.clients.create.path, async (req, res) => {
     try {
-        const input = api.clients.create.input.parse(req.body);
-        const item = await storage.createClient(input);
-        res.status(201).json(item);
+      const input = api.clients.create.input.parse(req.body);
+      const item = await storage.createClient(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.clients.update.path, async (req, res) => {
     try {
-        const input = api.clients.update.input.parse(req.body);
-        const item = await storage.updateClient(Number(req.params.id), input);
-        res.json(item);
+      const input = api.clients.update.input.parse(req.body);
+      const item = await storage.updateClient(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.clients.delete.path, async (req, res) => {
@@ -105,28 +105,28 @@ export async function registerRoutes(
   });
   app.post(api.sites.create.path, async (req, res) => {
     try {
-        const input = api.sites.create.input.parse(req.body);
-        const item = await storage.createSite(input);
-        res.status(201).json(item);
+      const input = api.sites.create.input.parse(req.body);
+      const item = await storage.createSite(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.sites.update.path, async (req, res) => {
     try {
-        const input = api.sites.update.input.parse(req.body);
-        const item = await storage.updateSite(Number(req.params.id), input);
-        res.json(item);
+      const input = api.sites.update.input.parse(req.body);
+      const item = await storage.updateSite(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.sites.delete.path, async (req, res) => {
@@ -141,28 +141,28 @@ export async function registerRoutes(
   });
   app.post(api.operationModes.create.path, async (req, res) => {
     try {
-        const input = api.operationModes.create.input.parse(req.body);
-        const item = await storage.createOperationMode(input);
-        res.status(201).json(item);
+      const input = api.operationModes.create.input.parse(req.body);
+      const item = await storage.createOperationMode(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.operationModes.update.path, async (req, res) => {
     try {
-        const input = api.operationModes.update.input.parse(req.body);
-        const item = await storage.updateOperationMode(Number(req.params.id), input);
-        res.json(item);
+      const input = api.operationModes.update.input.parse(req.body);
+      const item = await storage.updateOperationMode(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.operationModes.delete.path, async (req, res) => {
@@ -177,28 +177,28 @@ export async function registerRoutes(
   });
   app.post(api.establishmentTypes.create.path, async (req, res) => {
     try {
-        const input = api.establishmentTypes.create.input.parse(req.body);
-        const item = await storage.createEstablishmentType(input);
-        res.status(201).json(item);
+      const input = api.establishmentTypes.create.input.parse(req.body);
+      const item = await storage.createEstablishmentType(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.establishmentTypes.update.path, async (req, res) => {
     try {
-        const input = api.establishmentTypes.update.input.parse(req.body);
-        const item = await storage.updateEstablishmentType(Number(req.params.id), input);
-        res.json(item);
+      const input = api.establishmentTypes.update.input.parse(req.body);
+      const item = await storage.updateEstablishmentType(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.establishmentTypes.delete.path, async (req, res) => {
@@ -213,28 +213,28 @@ export async function registerRoutes(
   });
   app.post(api.establishments.create.path, async (req, res) => {
     try {
-        const input = api.establishments.create.input.parse(req.body);
-        const item = await storage.createEstablishment(input);
-        res.status(201).json(item);
+      const input = api.establishments.create.input.parse(req.body);
+      const item = await storage.createEstablishment(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.establishments.update.path, async (req, res) => {
     try {
-        const input = api.establishments.update.input.parse(req.body);
-        const item = await storage.updateEstablishment(Number(req.params.id), input);
-        res.json(item);
+      const input = api.establishments.update.input.parse(req.body);
+      const item = await storage.updateEstablishment(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.establishments.delete.path, async (req, res) => {
@@ -249,32 +249,70 @@ export async function registerRoutes(
   });
   app.post(api.meters.create.path, async (req, res) => {
     try {
-        const input = api.meters.create.input.parse(req.body);
-        const item = await storage.createMeter(input);
-        res.status(201).json(item);
+      const input = api.meters.create.input.parse(req.body);
+      const item = await storage.createMeter(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.meters.update.path, async (req, res) => {
     try {
-        const input = api.meters.update.input.parse(req.body);
-        const item = await storage.updateMeter(Number(req.params.id), input);
-        res.json(item);
+      const input = api.meters.update.input.parse(req.body);
+      const item = await storage.updateMeter(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
+    }
+  });
+  app.patch("/api/meters/:id/valve", async (req, res) => {
+    try {
+      const { valveStatus } = req.body;
+      if (!['open', 'closed', 'offline'].includes(valveStatus)) {
+        return res.status(400).json({ message: "Invalid valve status" });
+      }
+      const item = await storage.updateMeter(Number(req.params.id), { valveStatus });
+      res.json(item);
+    } catch (err) {
+      res.status(404).json({ message: "Meter not found" });
     }
   });
   app.delete(api.meters.delete.path, async (req, res) => {
     await storage.deleteMeter(Number(req.params.id));
+    res.status(204).send();
+  });
+
+  // Occupancies
+  app.get("/api/establishments/:establishmentId/occupancies", async (req, res) => {
+    const items = await storage.getOccupanciesByEstablishment(Number(req.params.establishmentId));
+    res.json(items);
+  });
+  app.post("/api/occupancies", async (req, res) => {
+    try {
+      const item = await storage.createOccupancy(req.body);
+      res.status(201).json(item);
+    } catch (err: any) {
+      res.status(400).json({ message: err.message });
+    }
+  });
+  app.put("/api/occupancies/:id", async (req, res) => {
+    try {
+      const item = await storage.updateOccupancy(Number(req.params.id), req.body);
+      res.json(item);
+    } catch (err) {
+      res.status(404).json({ message: "Occupancy not found" });
+    }
+  });
+  app.delete("/api/occupancies/:id", async (req, res) => {
+    await storage.deleteOccupancy(Number(req.params.id));
     res.status(204).send();
   });
 
@@ -285,28 +323,28 @@ export async function registerRoutes(
   });
   app.post(api.billingProfiles.create.path, async (req, res) => {
     try {
-        const input = api.billingProfiles.create.input.parse(req.body);
-        const item = await storage.createBillingProfile(input);
-        res.status(201).json(item);
+      const input = api.billingProfiles.create.input.parse(req.body);
+      const item = await storage.createBillingProfile(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.billingProfiles.update.path, async (req, res) => {
     try {
-        const input = api.billingProfiles.update.input.parse(req.body);
-        const item = await storage.updateBillingProfile(Number(req.params.id), input);
-        res.json(item);
+      const input = api.billingProfiles.update.input.parse(req.body);
+      const item = await storage.updateBillingProfile(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.billingProfiles.delete.path, async (req, res) => {
@@ -321,33 +359,58 @@ export async function registerRoutes(
   });
   app.post(api.mpesaKeys.create.path, async (req, res) => {
     try {
-        const input = api.mpesaKeys.create.input.parse(req.body);
-        const item = await storage.createMpesaKey(input);
-        res.status(201).json(item);
+      const input = api.mpesaKeys.create.input.parse(req.body);
+      const item = await storage.createMpesaKey(input);
+      res.status(201).json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            throw err;
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
     }
   });
   app.put(api.mpesaKeys.update.path, async (req, res) => {
     try {
-        const input = api.mpesaKeys.update.input.parse(req.body);
-        const item = await storage.updateMpesaKey(Number(req.params.id), input);
-        res.json(item);
+      const input = api.mpesaKeys.update.input.parse(req.body);
+      const item = await storage.updateMpesaKey(Number(req.params.id), input);
+      res.json(item);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            res.status(400).json({ message: err.errors[0].message });
-        } else {
-            res.status(404).json({ message: "Not found" });
-        }
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        res.status(404).json({ message: "Not found" });
+      }
     }
   });
   app.delete(api.mpesaKeys.delete.path, async (req, res) => {
     await storage.deleteMpesaKey(Number(req.params.id));
     res.status(204).send();
+  });
+
+  // Transactions
+  app.get(api.transactions.list.path, async (req, res) => {
+    const items = await storage.getTransactions();
+    res.json(items);
+  });
+  app.post(api.transactions.create.path, async (req, res) => {
+    try {
+      const input = api.transactions.create.input.parse(req.body);
+      const item = await storage.createTransaction(input);
+      res.status(201).json(item);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: err.errors[0].message });
+      } else {
+        throw err;
+      }
+    }
+  });
+
+  // Events
+  app.get(api.events.list.path, async (req, res) => {
+    const items = await storage.getEvents();
+    res.json(items);
   });
 
   // Seed Data
@@ -367,11 +430,11 @@ export async function registerRoutes(
 
   if ((await storage.getAdmins()).length === 0) {
     console.log("Seeding initial admin...");
-    await storage.createAdmin({ 
-        name: "Super Admin", 
-        email: "admin@waterhub.com", 
-        address: "HQ", 
-        phone: "0700000000" 
+    await storage.createAdmin({
+      name: "Super Admin",
+      email: "admin@waterhub.com",
+      address: "HQ",
+      phone: "0700000000"
     });
   }
 

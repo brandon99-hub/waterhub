@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertSite } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type InsertSite } from "@shared/schema";
 
 export function useSites() {
   return useQuery({
@@ -52,9 +53,9 @@ export function useDeleteSite() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.sites.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.sites.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete site");
     },

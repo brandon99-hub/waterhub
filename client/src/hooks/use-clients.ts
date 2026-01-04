@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertClient } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type InsertClient } from "@shared/schema";
 
 export function useClients() {
   return useQuery({
@@ -52,9 +53,9 @@ export function useDeleteClient() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.clients.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.clients.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete client");
     },
