@@ -25,8 +25,8 @@ export default function Sites() {
   const { marginClass } = useResponsiveLayout();
 
   const filteredSites = (sites || []).filter((s: any) =>
-    s.siteName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (s.siteName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ((s.location || "") + (s.latitude || "") + (s.longitude || "")).toLowerCase().includes(searchTerm.toLowerCase()) ||
     getClientName(s.clientId).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -43,10 +43,20 @@ export default function Sites() {
       header: "Location",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm">
-            {item.location || "No location set"}
-          </span>
+          <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">
+              {item.location || "Unnamed Location"}
+            </span>
+            {item.latitude && item.longitude && (
+              <span className="text-[10px] text-muted-foreground font-mono">
+                {item.latitude}, {item.longitude}
+              </span>
+            )}
+            {!item.location && !item.latitude && (
+              <span className="text-xs italic text-muted-foreground/60">No location set</span>
+            )}
+          </div>
         </div>
       )
     },

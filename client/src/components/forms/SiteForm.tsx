@@ -88,6 +88,17 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
         }
     });
 
+    useEffect(() => {
+        if (initialData) {
+            form.reset(initialData);
+            setSelectedLocation(initialData.location || "");
+            setSearchQuery(initialData.location || "");
+            if (initialData.latitude && initialData.longitude) {
+                setMapPosition([parseFloat(initialData.latitude), parseFloat(initialData.longitude)]);
+            }
+        }
+    }, [initialData, form]);
+
     const isPending = createSite.isPending || updateSite.isPending;
 
     const handleLocationSelect = (lat: number, lng: number) => {
@@ -96,10 +107,11 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
         form.setValue("longitude", lng.toFixed(6));
 
         // If no location name is selected, set a placeholder derived from coordinates
-        if (!selectedLocation || selectedLocation === "No location set") {
+        if (!selectedLocation || selectedLocation === "No location set" || selectedLocation === "") {
             const placeholder = `Pinned at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
             setSelectedLocation(placeholder);
             form.setValue("location", placeholder);
+            setSearchQuery(placeholder);
         }
     };
 
@@ -127,7 +139,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchQuery) {
+            if (searchQuery && searchQuery !== selectedLocation) {
                 searchPlace(searchQuery);
             }
         }, 500);
@@ -145,6 +157,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
         handleLocationSelect(lat, lng);
         setSelectedLocation(formattedLocation);
         setSearchQuery(formattedLocation);
+        form.setValue("location", formattedLocation);
         setShowResults(false);
     };
 
@@ -152,7 +165,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
         const payload = {
             ...data,
             clientId: Number(data.clientId),
-            location: selectedLocation,
+            location: selectedLocation || data.location,
             latitude: data.latitude,
             longitude: data.longitude
         };
@@ -242,11 +255,10 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
                                 className="pl-10 h-12 bg-muted/40 border-border/60 focus:bg-background transition-all"
                                 value={searchQuery || selectedLocation}
                                 onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    if (e.target.value === "") {
-                                        setSelectedLocation("");
-                                        form.setValue("location", "");
-                                    }
+                                    const val = e.target.value;
+                                    setSearchQuery(val);
+                                    setSelectedLocation(val);
+                                    form.setValue("location", val);
                                 }}
                                 onFocus={() => searchResults.length > 0 && setShowResults(true)}
                             />
