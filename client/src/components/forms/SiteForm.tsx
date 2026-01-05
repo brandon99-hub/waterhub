@@ -139,7 +139,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchQuery && searchQuery !== selectedLocation) {
+            if (searchQuery && searchQuery.trim().length > 2) {
                 searchPlace(searchQuery);
             }
         }, 500);
@@ -253,7 +253,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
                             <Input
                                 placeholder="Search for a place... (e.g., Kileleshwa, Nairobi)"
                                 className="pl-10 h-12 bg-muted/40 border-border/60 focus:bg-background transition-all"
-                                value={searchQuery || selectedLocation}
+                                value={searchQuery}
                                 onChange={(e) => {
                                     const val = e.target.value;
                                     setSearchQuery(val);
@@ -269,7 +269,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
 
                         {/* Search Results Dropdown */}
                         {showResults && searchResults.length > 0 && (
-                            <div className="absolute z-50 w-full mt-2 bg-background border border-border rounded-xl shadow-2xl max-h-60 overflow-y-auto">
+                            <div className="absolute z-[1000] w-full mt-2 bg-background border border-border rounded-xl shadow-2xl max-h-60 overflow-y-auto">
                                 {searchResults.map((result, idx) => (
                                     <button
                                         key={idx}
@@ -285,7 +285,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
                         )}
 
                         {showResults && searchResults.length === 0 && searchQuery && !isSearching && (
-                            <div className="absolute z-50 w-full mt-2 bg-background border border-border rounded-xl shadow-xl px-4 py-3">
+                            <div className="absolute z-[1000] w-full mt-2 bg-background border border-border rounded-xl shadow-xl px-4 py-3">
                                 <p className="text-sm text-muted-foreground">No results found. Try a different search term.</p>
                             </div>
                         )}
