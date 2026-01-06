@@ -10,6 +10,7 @@ import { Users, Pencil, Trash2, LayoutList, LayoutGrid, Search, MapPinPlus } fro
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { useToast } from "@/hooks/use-toast";
 import { ClientForm } from "@/components/forms/ClientForm";
 import { SiteForm } from "@/components/forms/SiteForm";
@@ -23,6 +24,7 @@ export default function Clients() {
   const [siteModalOpen, setSiteModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
   const [addingSiteToClient, setAddingSiteToClient] = useState<any>(null);
+  const [clientToDelete, setClientToDelete] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
@@ -45,8 +47,17 @@ export default function Clients() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Are you sure? This will delete the client and related data.")) {
-      deleteClient.mutate(id, { onSuccess: () => toast({ title: "Client deleted" }) });
+    setClientToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (clientToDelete) {
+      deleteClient.mutate(clientToDelete, {
+        onSuccess: () => {
+          toast({ title: "Client deleted" });
+          setClientToDelete(null);
+        },
+      });
     }
   };
 
@@ -65,6 +76,7 @@ export default function Clients() {
             className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors rounded-xl"
             onClick={() => handleAddSite(item)}
             title="Add Site"
+            aria-label={`Add site for ${item.name}`}
           >
             <MapPinPlus className="h-4 w-4" />
           </Button>
@@ -74,6 +86,7 @@ export default function Clients() {
             className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors rounded-xl"
             onClick={() => handleEdit(item)}
             title="Edit Client"
+            aria-label={`Edit ${item.name}`}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -83,6 +96,7 @@ export default function Clients() {
             className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors rounded-xl"
             onClick={() => handleDelete(item.id)}
             title="Delete Client"
+            aria-label={`Delete ${item.name}`}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -111,6 +125,7 @@ export default function Clients() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
                 placeholder="Search clients..."
+                aria-label="Search clients"
                 className="pl-10 h-11 bg-muted/40 border-border/60 rounded-xl focus:bg-background transition-all"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -158,6 +173,7 @@ export default function Clients() {
                 className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
                 onClick={() => handleAddSite(item)}
                 title="Add Site"
+                aria-label={`Add site for ${item.name}`}
               >
                 <MapPinPlus className="h-4 w-4" />
               </Button>
@@ -165,6 +181,14 @@ export default function Clients() {
           />
         )}
       </main>
+
+      <DeleteConfirmDialog
+        open={!!clientToDelete}
+        onConfirm={confirmDelete}
+        onCancel={() => setClientToDelete(null)}
+        title="Delete Client"
+        description="Are you sure? This will delete the client and related data. This action cannot be undone."
+      />
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent>

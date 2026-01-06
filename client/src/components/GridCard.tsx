@@ -14,9 +14,10 @@ interface GridCardProps {
         getEstablishmentName?: (id: number | null) => string;
         getModeName?: (id: number) => string;
     };
+    extraActions?: (item: any) => React.ReactNode;
 }
 
-export function GridCard({ item, type, onEdit, onDelete, helpers }: GridCardProps) {
+export function GridCard({ item, type, onEdit, onDelete, helpers, extraActions }: GridCardProps) {
     if (type === "meter") {
         return (
             <Card className="p-6 hover:shadow-xl transition-all duration-300 border-border/40 bg-card/60 backdrop-blur-sm group">
@@ -81,6 +82,7 @@ export function GridCard({ item, type, onEdit, onDelete, helpers }: GridCardProp
                 </div>
 
                 <div className="flex items-center gap-2 pt-4 border-t border-border/40">
+                    {extraActions && extraActions(item)}
                     <Button
                         variant="outline"
                         size="sm"
@@ -137,6 +139,7 @@ export function GridCard({ item, type, onEdit, onDelete, helpers }: GridCardProp
                 </div>
 
                 <div className="flex items-center gap-2 pt-4 border-t border-border/40">
+                    {extraActions && extraActions(item)}
                     <Button
                         variant="outline"
                         size="sm"
