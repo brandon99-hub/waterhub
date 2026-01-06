@@ -26,16 +26,20 @@ interface OccupancyFormProps {
     onSuccess: () => void;
     onSubmit: (data: any) => void;
     isPending: boolean;
+    preselectedEstablishmentId?: number;
 }
 
-export function OccupancyForm({ establishmentId, initialData, onSuccess, onSubmit, isPending }: OccupancyFormProps) {
+export function OccupancyForm({ establishmentId, initialData, onSuccess, onSubmit, isPending, preselectedEstablishmentId }: OccupancyFormProps) {
     const { data: meters } = useMeters();
     const { toast } = useToast();
+
+    // If preselectedEstablishmentId is provided, override the passed establishmentId (though usually they would be the same in this context)
+    const effectiveEstablishmentId = preselectedEstablishmentId || establishmentId;
 
     const form = useForm({
         resolver: zodResolver(occupancySchema),
         defaultValues: initialData || {
-            establishmentId,
+            establishmentId: effectiveEstablishmentId,
             unitNumber: "",
             customerName: "",
             customerPhone: "",
@@ -48,7 +52,7 @@ export function OccupancyForm({ establishmentId, initialData, onSuccess, onSubmi
     const handleSubmit = (data: any) => {
         const payload = {
             ...data,
-            establishmentId,
+            establishmentId: effectiveEstablishmentId,
             meterId: data.meterId ? Number(data.meterId) : null,
         };
         onSubmit(payload);

@@ -6,12 +6,13 @@ import { PageHeader } from "@/components/PageHeader";
 import { DataTable } from "@/components/DataTable";
 import { GridView } from "@/components/GridView";
 import { EmptyState } from "@/components/EmptyState";
-import { Users, Pencil, Trash2, LayoutList, LayoutGrid, Search } from "lucide-react";
+import { Users, Pencil, Trash2, LayoutList, LayoutGrid, Search, MapPinPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ClientForm } from "@/components/forms/ClientForm";
+import { SiteForm } from "@/components/forms/SiteForm";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,9 @@ export default function Clients() {
   const { data: clients, isLoading } = useClients();
   const deleteClient = useDeleteClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [siteModalOpen, setSiteModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
+  const [addingSiteToClient, setAddingSiteToClient] = useState<any>(null);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
@@ -34,6 +37,11 @@ export default function Clients() {
   const handleEdit = (client: any) => {
     setEditingClient(client);
     setModalOpen(true);
+  };
+
+  const handleAddSite = (client: any) => {
+    setAddingSiteToClient(client);
+    setSiteModalOpen(true);
   };
 
   const handleDelete = (id: number) => {
@@ -51,6 +59,15 @@ export default function Clients() {
       header: "Actions",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors rounded-xl"
+            onClick={() => handleAddSite(item)}
+            title="Add Site"
+          >
+            <MapPinPlus className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -127,11 +144,50 @@ export default function Clients() {
         ) : viewMode === "table" ? (
           <DataTable data={filteredClients} columns={columns} searchKey="name" searchPlaceholder="Search clients..." hideSearch />
         ) : (
-          <GridView data={filteredClients} type="client" searchKey="name" searchPlaceholder="Search clients..." onEdit={handleEdit} onDelete={handleDelete} />
+          <GridView
+            data={filteredClients}
+            type="client"
+            searchKey="name"
+            searchPlaceholder="Search clients..."
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            extraActions={(item: any) => (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                onClick={() => handleAddSite(item)}
+                title="Add Site"
+              >
+                <MapPinPlus className="h-4 w-4" />
+              </Button>
+            )}
+          />
         )}
       </main>
+
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent><DialogHeader><DialogTitle>{editingClient ? "Edit Client" : "Add New Client"}</DialogTitle></DialogHeader><ClientForm initialData={editingClient} onSuccess={() => setModalOpen(false)} /></DialogContent>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingClient ? "Edit Client" : "Add New Client"}</DialogTitle>
+          </DialogHeader>
+          <ClientForm initialData={editingClient} onSuccess={() => setModalOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={siteModalOpen} onOpenChange={setSiteModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Site for {addingSiteToClient?.name}</DialogTitle>
+          </DialogHeader>
+          <SiteForm
+            preselectedClientId={addingSiteToClient?.id}
+            onSuccess={() => {
+              setSiteModalOpen(false);
+              setAddingSiteToClient(null);
+            }}
+          />
+        </DialogContent>
       </Dialog>
     </div>
   );

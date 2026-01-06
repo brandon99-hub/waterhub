@@ -13,24 +13,29 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Pencil, Trash2, MapPin, Tags, Users, Search } from "lucide-react";
+import { Building2, Pencil, Trash2, MapPin, Tags, Users, Search, Home } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { EstablishmentForm } from "@/components/forms/EstablishmentForm";
+import { OccupancyForm } from "@/components/forms/OccupancyForm";
 import { useEstablishmentTypes } from "../hooks/use-establishment-types";
 import { useSites } from "@/hooks/use-sites";
 import type { Establishment } from "@shared/schema";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { cn } from "@/lib/utils";
+import { useCreateOccupancy } from "@/hooks/use-occupancies";
 
 export default function Establishments() {
     const { toast } = useToast();
     const [, setLocation] = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [occupancyModalOpen, setOccupancyModalOpen] = useState(false);
     const [editingEst, setEditingEst] = useState<Establishment | null>(null);
+    const [addingUnitToEst, setAddingUnitToEst] = useState<Establishment | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const { marginClass } = useResponsiveLayout();
+    const createOccupancy = useCreateOccupancy();
 
     const { data: establishments, isLoading } = useQuery<Establishment[]>({
         queryKey: [api.establishments.list.path]
@@ -66,10 +71,28 @@ export default function Establishments() {
         setIsModalOpen(true);
     };
 
+    const handleAddUnit = (est: Establishment) => {
+        setAddingUnitToEst(est);
+        setOccupancyModalOpen(true);
+    };
+
     const handleDelete = (id: number) => {
         if (confirm("Permanently delete this establishment?")) {
             deleteMutation.mutate(id);
         }
+    };
+
+    const onOccupancySubmit = (data: any) => {
+        createOccupancy.mutate(data, {
+            onSuccess: () => {
+                toast({ title: "Unit Added", description: "The unit has been successfully added to the establishment." });
+                setOccupancyModalOpen(false);
+                setAddingUnitToEst(null);
+            },
+            onError: (err: any) => {
+                toast({ title: "Error", description: err.message, variant: "destructive" });
+            }
+        });
     };
 
     const columns = [
@@ -114,6 +137,15 @@ export default function Establishments() {
             header: "Actions",
             cell: (item: any) => (
                 <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors rounded-xl"
+                        onClick={() => handleAddUnit(item)}
+                        title="Add Unit"
+                    >
+                        <Home className="h-4 w-4" />
+                    </Button>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -210,6 +242,23 @@ export default function Establishments() {
                         initialData={editingEst || undefined}
                         onSuccess={() => setIsModalOpen(false)}
                     />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={occupancyModalOpen} onOpenChange={setOccupancyModalOpen}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Add Unit to {addingUnitToEst?.establishmentName}</DialogTitle>
+                    </DialogHeader>
+                    {addingUnitToEst && (
+                        <OccupancyForm
+                            establishmentId={addingUnitToEst.id}
+                            preselectedEstablishmentId={addingUnitToEst.id}
+                            onSuccess={() => {}}
+                            onSubmit={onOccupancySubmit}
+                            isPending={createOccupancy.isPending}
+                        />
+                    )}
                 </DialogContent>
             </Dialog>
         </div>
