@@ -12,7 +12,7 @@ import { useCreateEstablishment, useUpdateEstablishment } from "@/hooks/use-esta
 import { useEstablishmentTypes } from "@/hooks/use-establishment-types";
 import { useSites } from "@/hooks/use-sites";
 
-export function EstablishmentForm({ initialData, onSuccess }: { initialData?: any, onSuccess: () => void }) {
+export function EstablishmentForm({ initialData, onSuccess, preselectedSiteId }: { initialData?: any, onSuccess: () => void, preselectedSiteId?: number }) {
     const createEst = useCreateEstablishment();
     const updateEst = useUpdateEstablishment();
     const { data: types } = useEstablishmentTypes();
@@ -21,7 +21,7 @@ export function EstablishmentForm({ initialData, onSuccess }: { initialData?: an
 
     const form = useForm({
         resolver: zodResolver(insertEstablishmentSchema),
-        defaultValues: initialData || { establishmentName: "", establishmentTypeId: "", siteId: "" }
+        defaultValues: initialData || { establishmentName: "", establishmentTypeId: "", siteId: preselectedSiteId || "" }
     });
 
     const onSubmit = (data: any) => {
@@ -86,27 +86,29 @@ export function EstablishmentForm({ initialData, onSuccess }: { initialData?: an
                                 </FormItem>
                             )} />
 
-                            <FormField control={form.control} name="siteId" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Host Site</FormLabel>
-                                    <Select onValueChange={(v) => field.onChange(parseInt(v))} defaultValue={field.value?.toString()}>
-                                        <FormControl>
-                                            <SelectTrigger className="h-12 bg-muted/40 border-border/60">
-                                                <div className="flex items-center gap-2">
-                                                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                                                    <SelectValue placeholder="Select site" />
-                                                </div>
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {sites?.map(s => (
-                                                <SelectItem key={s.id} value={s.id.toString()}>{s.siteName}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
+                            {!preselectedSiteId && (
+                                <FormField control={form.control} name="siteId" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Host Site</FormLabel>
+                                        <Select onValueChange={(v) => field.onChange(parseInt(v))} defaultValue={field.value?.toString()}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-12 bg-muted/40 border-border/60">
+                                                    <div className="flex items-center gap-2">
+                                                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                                                        <SelectValue placeholder="Select site" />
+                                                    </div>
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {sites?.map(s => (
+                                                    <SelectItem key={s.id} value={s.id.toString()}>{s.siteName}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                            )}
                         </div>
                     </div>
                 </div>

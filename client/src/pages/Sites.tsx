@@ -5,12 +5,13 @@ import { Sidebar } from "@/components/Sidebar";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTable } from "@/components/DataTable";
 import { EmptyState } from "@/components/EmptyState";
-import { MapPin, Pencil, Trash2, Search } from "lucide-react";
+import { MapPin, Pencil, Trash2, Search, Building2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { SiteForm } from "@/components/forms/SiteForm";
+import { EstablishmentForm } from "@/components/forms/EstablishmentForm";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,9 @@ export default function Sites() {
   const { data: clients } = useClients();
   const deleteSite = useDeleteSite();
   const [modalOpen, setModalOpen] = useState(false);
+  const [establishmentModalOpen, setEstablishmentModalOpen] = useState(false);
   const [editingSite, setEditingSite] = useState<any>(null);
+  const [addingEstToSite, setAddingEstToSite] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const { marginClass } = useResponsiveLayout();
@@ -31,6 +34,12 @@ export default function Sites() {
   );
 
   const handleEdit = (site: any) => { setEditingSite(site); setModalOpen(true); };
+
+  const handleAddEstablishment = (site: any) => {
+    setAddingEstToSite(site);
+    setEstablishmentModalOpen(true);
+  };
+
   const handleDelete = (id: number) => {
     if (confirm("Delete this site?")) deleteSite.mutate(id, { onSuccess: () => toast({ title: "Site deleted" }) });
   };
@@ -65,6 +74,15 @@ export default function Sites() {
       header: "Actions",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors rounded-xl"
+            onClick={() => handleAddEstablishment(item)}
+            title="Add Establishment"
+          >
+            <Building2 className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -123,6 +141,21 @@ export default function Sites() {
       </main>
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent><DialogHeader><DialogTitle>{editingSite ? "Edit Site" : "Add New Site"}</DialogTitle></DialogHeader><SiteForm initialData={editingSite} onSuccess={() => setModalOpen(false)} /></DialogContent>
+      </Dialog>
+
+      <Dialog open={establishmentModalOpen} onOpenChange={setEstablishmentModalOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Add Establishment to {addingEstToSite?.siteName}</DialogTitle>
+          </DialogHeader>
+          <EstablishmentForm
+            preselectedSiteId={addingEstToSite?.id}
+            onSuccess={() => {
+              setEstablishmentModalOpen(false);
+              setAddingEstToSite(null);
+            }}
+          />
+        </DialogContent>
       </Dialog>
     </div>
   );

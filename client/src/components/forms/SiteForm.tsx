@@ -27,6 +27,7 @@ L.Icon.Default.mergeOptions({
 interface SiteFormProps {
     initialData?: any;
     onSuccess: () => void;
+    preselectedClientId?: number;
 }
 
 interface SearchResult {
@@ -60,7 +61,7 @@ function LocationPicker({ onLocationSelect, initialPosition }: { onLocationSelec
     );
 }
 
-export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
+export function SiteForm({ initialData, onSuccess, preselectedClientId }: SiteFormProps) {
     const createSite = useCreateSite();
     const updateSite = useUpdateSite();
     const { data: clients } = useClients();
@@ -82,7 +83,7 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
         defaultValues: initialData || {
             siteName: "",
             location: "",
-            clientId: undefined,
+            clientId: preselectedClientId || undefined,
             latitude: "",
             longitude: ""
         }
@@ -219,20 +220,22 @@ export function SiteForm({ initialData, onSuccess }: SiteFormProps) {
                             </FormItem>
                         )} />
 
-                        <FormField control={form.control} name="clientId" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Client Owner</FormLabel>
-                                <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={field.value ? String(field.value) : undefined}>
-                                    <FormControl><SelectTrigger className="h-12 bg-muted/40 border-border/60"><SelectValue placeholder="Select a client" /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        {clients?.map((client) => (
-                                            <SelectItem key={client.id} value={String(client.id)}>{client.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
+                        {!preselectedClientId && (
+                            <FormField control={form.control} name="clientId" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Client Owner</FormLabel>
+                                    <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={field.value ? String(field.value) : undefined}>
+                                        <FormControl><SelectTrigger className="h-12 bg-muted/40 border-border/60"><SelectValue placeholder="Select a client" /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            {clients?.map((client) => (
+                                                <SelectItem key={client.id} value={String(client.id)}>{client.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        )}
                     </div>
                 </div>
 
