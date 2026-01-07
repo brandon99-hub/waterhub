@@ -16,6 +16,7 @@ interface GridViewProps {
         getEstablishmentName?: (id: number | null) => string;
         getModeName?: (id: number) => string;
     };
+    extraActions?: (item: any) => React.ReactNode;
 }
 
 export function GridView({
@@ -25,7 +26,8 @@ export function GridView({
     searchPlaceholder = "Search...",
     onEdit,
     onDelete,
-    helpers
+    helpers,
+    extraActions
 }: GridViewProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -82,6 +84,7 @@ export function GridView({
                             onEdit={onEdit}
                             onDelete={onDelete}
                             helpers={helpers}
+                            extraActions={extraActions}
                         />
                     ))}
                 </div>
